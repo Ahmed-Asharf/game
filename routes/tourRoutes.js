@@ -1,4 +1,5 @@
 const express = require('express');
+
 const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
 const router = express.Router();
@@ -6,8 +7,12 @@ const router = express.Router();
 router
   .route('/')
   .get(tourController.getAll)
-  .post(authController.protect, tourController.createTournament);
-
+  .post(
+    authController.protect,
+    tourController.uploadTournamentsPhoto,
+    tourController.createTournament
+  );
+// ,
 router
   .route('/:id')
   .get(tourController.getOne)

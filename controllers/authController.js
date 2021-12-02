@@ -79,7 +79,6 @@ exports.protect = async (req, res, next) => {
           message: err.message,
         });
       }
-      req.user = docs;
     });
     next();
   } catch (err) {

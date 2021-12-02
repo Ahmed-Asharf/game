@@ -1,5 +1,6 @@
 const connection = require('../connect');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const sendResponse = (message, statusCode, res, isStatus, token = '') => {
   return res.status(statusCode).json({

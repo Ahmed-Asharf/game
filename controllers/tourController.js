@@ -1,4 +1,30 @@
 const connection = require('../connect');
+const multer = require('multer');
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/tournaments');
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `tournaments-${Date.now()}.${ext}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(err, false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadTournamentsPhoto = upload.single('tournamentsPhoto');
 
 const sendResponse = (message, statusCode, res, isStatus) => {
   return res.status(statusCode).json({
@@ -10,11 +36,23 @@ const sendResponse = (message, statusCode, res, isStatus) => {
 };
 
 exports.createTournament = (req, res) => {
-  const { tour_id, startDate, endDate, prize } = req.body;
-
-  const sql = `insert into tournaments(tour_id,startDate,endDate,prize) values (?)`;
-
-  const values = [tour_id, startDate, endDate, prize];
+  let tournamentsPhoto = null;
+  const { tour_id, startDate, endDate, prize, game_id, tournamentName } =
+    req.body;
+  if (req.file) {
+    tournamentsPhoto = req.file.filename;
+  }
+  const sql = `insert into tournaments(tour_id,startDate,endDate,prize,game_id,tournamentName,tournamentsPhoto) values (?)`;
+  const gameId = game_id ? game_id : null;
+  const values = [
+    tour_id,
+    startDate,
+    endDate,
+    prize,
+    gameId,
+    tournamentName,
+    tournamentsPhoto,
+  ];
 
   connection.query(sql, [values], (err, docs) => {
     if (err) {
